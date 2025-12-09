@@ -28,10 +28,8 @@ const Index = () => {
     if (isAdmin) {
       setIsAdmin(false);
     } else {
-      const password = prompt(
-        "Ho Ho Ho! What is the secret Santa code? (Hint: hohoho)"
-      );
-      if (password && password.toLowerCase() === "hohoho") {
+      const password = prompt("Enter admin password:");
+      if (password === "000000") {
         setIsAdmin(true);
       } else if (password) {
         alert("Nice try, Grinch!");
