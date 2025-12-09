@@ -333,21 +333,26 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
                 </p>
               </div>
 
-              {/* Image */}
+              {/* Image Thumbnail */}
               {letter.image_url && (
-                <div
-                  className="h-48 bg-muted relative group cursor-pointer border-t border-border"
-                  onClick={() => setSelectedImage(letter.image_url)}
-                >
-                  <img
-                    src={letter.image_url}
-                    alt="Drawing"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                    <span className="bg-card/80 px-2 py-1 rounded text-xs font-bold">
-                      View Full
-                    </span>
+                <div className="p-3 border-t border-border bg-muted/30">
+                  <div
+                    className="relative group cursor-pointer rounded-lg overflow-hidden border-2 border-border hover:border-primary/50 transition-colors"
+                    onClick={() => setSelectedImage(letter.image_url)}
+                  >
+                    <div className="aspect-video bg-muted">
+                      <img
+                        src={letter.image_url}
+                        alt="Drawing"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors flex items-center justify-center">
+                      <span className="bg-card px-3 py-1.5 rounded-full text-xs font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                        <Eye size={14} />
+                        View Full Size
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -377,17 +382,26 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
 
       {/* Image Preview Dialog */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>Drawing / Photo</DialogTitle>
-          </DialogHeader>
-          {selectedImage && (
-            <img
-              src={selectedImage}
-              alt="Full size drawing"
-              className="w-full h-auto rounded-lg"
-            />
-          )}
+        <DialogContent className="max-w-4xl p-0 overflow-hidden">
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 z-10 bg-card/80 hover:bg-card rounded-full"
+              onClick={() => setSelectedImage(null)}
+            >
+              <X size={20} />
+            </Button>
+            {selectedImage && (
+              <div className="bg-muted/50 p-4 flex items-center justify-center min-h-[300px] max-h-[80vh]">
+                <img
+                  src={selectedImage}
+                  alt="Full size drawing"
+                  className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-lg"
+                />
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
