@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Phone, Mail, Trash2, Search, Filter, Eye, EyeOff, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
+import { getSupabase } from "@/lib/supabase-safe";
 import { useToast } from "@/hooks/use-toast";
 import {
   Select,
@@ -59,6 +59,7 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
     fetchLetters();
 
     // Subscribe to real-time updates
+    const supabase = getSupabase();
     const channel = supabase
       .channel("letters-changes")
       .on(
@@ -76,6 +77,7 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
   }, []);
 
   const fetchLetters = async () => {
+    const supabase = getSupabase();
     const { data, error } = await supabase
       .from("santa_letters")
       .select("*")
@@ -94,6 +96,7 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
   };
 
   const deleteLetter = async (id: string) => {
+    const supabase = getSupabase();
     const { error } = await supabase.from("santa_letters").delete().eq("id", id);
 
     if (error) {
@@ -109,6 +112,7 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
   };
 
   const toggleRead = async (id: string, currentStatus: boolean) => {
+    const supabase = getSupabase();
     const { error } = await supabase
       .from("santa_letters")
       .update({ is_read: !currentStatus })

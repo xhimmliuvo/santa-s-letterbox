@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
+import { getSupabase, isSupabaseConfigured } from "@/lib/supabase-safe";
 import { useToast } from "@/hooks/use-toast";
 
 interface LetterFormProps {
@@ -103,6 +103,7 @@ const LetterForm = ({ onSuccess, onSending }: LetterFormProps) => {
     setIsLoading(true);
 
     try {
+      const supabase = getSupabase();
       let imageUrl: string | null = null;
 
       // Upload image if exists
