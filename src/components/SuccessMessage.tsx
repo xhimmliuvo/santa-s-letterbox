@@ -1,5 +1,6 @@
-import { CheckCircle, RefreshCcw, Snowflake } from "lucide-react";
+import { CheckCircle, RefreshCcw, Snowflake, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import TicketClaim from "./TicketClaim";
 
 interface SuccessMessageProps {
   name: string;
@@ -7,7 +8,7 @@ interface SuccessMessageProps {
   onReset: () => void;
 }
 
-const SuccessMessage = ({ name, imageUrl, onReset }: SuccessMessageProps) => {
+const SuccessMessage = ({ name, onReset }: SuccessMessageProps) => {
   return (
     <div className="relative group">
       {/* The Envelope / Success Card */}
@@ -39,37 +40,49 @@ const SuccessMessage = ({ name, imageUrl, onReset }: SuccessMessageProps) => {
           </p>
         </div>
 
-        <div className="bg-card border border-border p-4 rounded shadow-sm rotate-1 max-w-xs mx-auto mb-6 relative">
+        <div className="bg-card border border-border p-4 rounded shadow-sm rotate-1 max-w-xs mx-auto mb-4 relative">
           <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-primary rounded-full border-4 border-card shadow-sm z-10" />
           <p className="font-serif text-lg text-foreground leading-relaxed text-center">
             "Ho Ho Ho! Thank you for your letter,{" "}
             <span className="font-bold text-primary">{name}</span>! The elves
             will start working right away!"
           </p>
-          <p
-            className="text-right text-xl text-primary mt-4 pr-4 font-bold font-serif"
-          >
+          <p className="text-right text-xl text-primary mt-4 pr-4 font-bold font-serif">
             - Santa Claus
           </p>
         </div>
 
-        {imageUrl && (
-          <div className="mb-6 border-4 border-card shadow-lg -rotate-2 w-32 h-32 mx-auto bg-muted overflow-hidden rounded-lg">
-            <img
-              src={imageUrl}
-              alt="Your upload"
-              className="w-full h-full object-cover"
-            />
+        {/* Event Invitation */}
+        <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 mb-6">
+          <h3 className="font-bold text-primary text-center mb-3 text-lg">
+            🎄 You're Invited! 🎄
+          </h3>
+          <div className="space-y-2 text-sm text-foreground">
+            <div className="flex items-center gap-2">
+              <MapPin size={16} className="text-primary flex-shrink-0" />
+              <span>Phungreitang, Opposite Electric Dept Office</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock size={16} className="text-primary flex-shrink-0" />
+              <span>December 25th at Midnight</span>
+            </div>
           </div>
-        )}
+          <p className="text-xs text-muted-foreground text-center mt-3">
+            Don't forget to claim your ticket below!
+          </p>
+        </div>
 
-        <Button
-          onClick={onReset}
-          className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold py-3"
-        >
-          <RefreshCcw size={18} />
-          Send Another Letter
-        </Button>
+        <div className="space-y-3">
+          <TicketClaim />
+          <Button
+            onClick={onReset}
+            variant="outline"
+            className="w-full font-bold py-3"
+          >
+            <RefreshCcw size={18} />
+            Send Another Letter
+          </Button>
+        </div>
       </div>
 
       {/* Decorative background behind card */}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Phone, Mail, Trash2, Search, Filter, Eye, EyeOff, X } from "lucide-react";
+import { Phone, Mail, Trash2, Search, Filter, Eye, EyeOff, X, MessageCircle, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getSupabase } from "@/lib/supabase-safe";
@@ -28,6 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import OfficialTicket from "./OfficialTicket";
 
 interface Letter {
   id: string;
@@ -54,6 +55,33 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
   const [readFilter, setReadFilter] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<string>("newest");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedTicket, setSelectedTicket] = useState<Letter | null>(null);
+
+  const openWhatsApp = (phone: string, name: string) => {
+    const message = encodeURIComponent(
+      `Hi! This is a reminder about Santa's Christmas Event 🎅\n\n` +
+      `Your child ${name} has been added to Santa's list!\n\n` +
+      `📍 Location: Phungreitang, Opposite Electric Dept Office\n` +
+      `🕛 Time: December 25th at Midnight\n\n` +
+      `Don't forget to bring the ticket! See you there! 🎄`
+    );
+    window.open(`https://wa.me/${phone.replace(/\D/g, "")}?text=${message}`, "_blank");
+  };
+
+  const openEmail = (email: string, name: string) => {
+    const subject = encodeURIComponent("🎅 Santa's Christmas Event Invitation");
+    const body = encodeURIComponent(
+      `Hello!\n\n` +
+      `This is a reminder about Santa's Christmas Event!\n\n` +
+      `Your child ${name} has been added to Santa's list and is invited to meet Santa!\n\n` +
+      `📍 Location: Phungreitang, Opposite Electric Dept Office\n` +
+      `🕛 Time: December 25th at Midnight\n\n` +
+      `Don't forget to bring the ticket for entry!\n\n` +
+      `See you there! 🎄\n\n` +
+      `- Santa x Dynamic Edu Collab`
+    );
+    window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_blank");
+  };
 
   useEffect(() => {
     fetchLetters();
@@ -298,14 +326,25 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
                 </div>
               </div>
 
-              {/* Contact Info */}
+              {/* Contact Info & Actions */}
               <div className="bg-muted/50 px-4 py-3 border-b text-sm space-y-2">
                 {letter.phone ? (
-                  <div className="flex items-center gap-2 text-foreground font-medium">
-                    <Phone size={14} className="text-primary" />
-                    <a href={`tel:${letter.phone}`} className="hover:underline">
-                      {letter.phone}
-                    </a>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-foreground font-medium">
+                      <Phone size={14} className="text-primary" />
+                      <a href={`tel:${letter.phone}`} className="hover:underline">
+                        {letter.phone}
+                      </a>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openWhatsApp(letter.phone!, letter.name)}
+                      className="h-7 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+                    >
+                      <MessageCircle size={14} />
+                      WhatsApp
+                    </Button>
                   </div>
                 ) : (
                   <div className="text-muted-foreground text-xs italic">
@@ -314,17 +353,37 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
                 )}
 
                 {letter.email ? (
-                  <div className="flex items-center gap-2 text-foreground font-medium">
-                    <Mail size={14} className="text-primary" />
-                    <a href={`mailto:${letter.email}`} className="hover:underline">
-                      {letter.email}
-                    </a>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-foreground font-medium">
+                      <Mail size={14} className="text-primary" />
+                      <span className="truncate max-w-[150px]">{letter.email}</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openEmail(letter.email!, letter.name)}
+                      className="h-7 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    >
+                      <Mail size={14} />
+                      Email
+                    </Button>
                   </div>
                 ) : (
                   <div className="text-muted-foreground text-xs italic">
                     No email provided
                   </div>
                 )}
+
+                {/* Generate Ticket Button */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedTicket(letter)}
+                  className="w-full mt-2 h-8 text-xs"
+                >
+                  <Ticket size={14} />
+                  View/Generate Ticket
+                </Button>
               </div>
 
               {/* Content */}
@@ -406,6 +465,23 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
               </div>
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Ticket Preview Dialog */}
+      <Dialog open={!!selectedTicket} onOpenChange={() => setSelectedTicket(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Official Ticket for {selectedTicket?.name}</DialogTitle>
+          </DialogHeader>
+          {selectedTicket && (
+            <OfficialTicket
+              ticketId={selectedTicket.id.slice(0, 8).toUpperCase()}
+              name={selectedTicket.name}
+              behavior={selectedTicket.behavior}
+              createdAt={selectedTicket.created_at}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>

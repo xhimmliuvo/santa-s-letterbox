@@ -29,7 +29,7 @@ const Index = () => {
       setIsAdmin(false);
     } else {
       const password = prompt("Enter admin password:");
-      if (password === "000000") {
+      if (password === "hohoho") {
         setIsAdmin(true);
       } else if (password) {
         alert("Nice try, Grinch!");
@@ -86,6 +86,13 @@ const Index = () => {
         {step === "sent" && (
           <SuccessMessage name={submittedName} onReset={handleReset} />
         )}
+      </div>
+
+      {/* Footer Branding */}
+      <div className="fixed bottom-4 left-0 right-0 text-center z-40">
+        <span className="bg-primary-foreground/10 backdrop-blur-sm px-4 py-2 rounded-full text-primary-foreground/70 text-sm font-medium">
+          Santa x Dynamic Edu Collab
+        </span>
       </div>
     </div>
   );

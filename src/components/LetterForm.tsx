@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Send, Star, Snowflake, Camera } from "lucide-react";
+import { Send, Star, Snowflake, Camera, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { getSupabase, isSupabaseConfigured } from "@/lib/supabase-safe";
+import { getSupabase } from "@/lib/supabase-safe";
 import { useToast } from "@/hooks/use-toast";
+import CameraCapture from "./CameraCapture";
 
 interface LetterFormProps {
   onSuccess: (name: string) => void;
@@ -56,6 +57,7 @@ const LetterForm = ({ onSuccess, onSending }: LetterFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     age: "",
@@ -86,6 +88,17 @@ const LetterForm = ({ onSuccess, onSending }: LetterFormProps) => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleCameraCapture = (imageData: string) => {
+    setImagePreview(imageData);
+    // Convert base64 to blob for upload
+    fetch(imageData)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const file = new File([blob], "selfie.jpg", { type: "image/jpeg" });
+        setImageFile(file);
+      });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -282,34 +295,64 @@ const LetterForm = ({ onSuccess, onSending }: LetterFormProps) => {
           <Label className="text-sm font-bold text-muted-foreground mb-2 block">
             Drawings or Photos (Optional)
           </Label>
-          <div className="border-2 border-dashed border-border rounded-xl p-4 text-center hover:bg-muted/50 transition-colors relative">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            />
-            {imagePreview ? (
-              <div className="relative h-32 w-full rounded-lg overflow-hidden bg-muted">
+          
+          {imagePreview ? (
+            <div className="border-2 border-border rounded-xl p-4 bg-muted/30">
+              <div className="relative h-32 w-full rounded-lg overflow-hidden bg-muted mb-3">
                 <img
                   src={imagePreview}
                   alt="Upload preview"
                   className="w-full h-full object-contain"
                 />
-                <div className="absolute inset-0 bg-foreground/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                  <span className="bg-card/80 px-2 py-1 rounded text-sm font-bold">
-                    Change Image
-                  </span>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setImagePreview(null);
+                  setImageFile(null);
+                }}
+                className="w-full"
+              >
+                Remove Image
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {/* File Upload */}
+              <div className="border-2 border-dashed border-border rounded-xl p-4 text-center hover:bg-muted/50 transition-colors relative cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <div className="flex flex-col items-center justify-center text-muted-foreground py-2">
+                  <Upload size={28} className="mb-2" />
+                  <span className="text-xs font-medium">Upload Photo</span>
                 </div>
               </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center text-muted-foreground py-2">
-                <Camera size={32} className="mb-2" />
-                <span className="text-sm">Click to upload a picture</span>
+
+              {/* Camera Capture */}
+              <div
+                onClick={() => setCameraOpen(true)}
+                className="border-2 border-dashed border-primary/50 rounded-xl p-4 text-center hover:bg-primary/10 transition-colors cursor-pointer"
+              >
+                <div className="flex flex-col items-center justify-center text-primary py-2">
+                  <Camera size={28} className="mb-2" />
+                  <span className="text-xs font-medium">Take Selfie</span>
+                </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
+
+        <CameraCapture
+          open={cameraOpen}
+          onClose={() => setCameraOpen(false)}
+          onCapture={handleCameraCapture}
+        />
 
         <Button
           type="submit"
