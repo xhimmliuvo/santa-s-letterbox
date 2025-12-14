@@ -24,16 +24,47 @@ const CameraCapture = ({ open, onClose, onCapture }: CameraCaptureProps) => {
   const startCamera = useCallback(async () => {
     try {
       setError(null);
+      
+      // Check if getUserMedia is supported
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setError("Camera not supported on this device/browser. Please use a modern browser or upload a photo instead.");
+        return;
+      }
+
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: 600, height: 600 },
+        video: { 
+          facingMode: "user",
+          width: { ideal: 600 },
+          height: { ideal: 600 }
+        },
+        audio: false
       });
+      
       setStream(mediaStream);
+      
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        // Wait for video to be ready
+        await new Promise<void>((resolve) => {
+          if (videoRef.current) {
+            videoRef.current.onloadedmetadata = () => {
+              videoRef.current?.play();
+              resolve();
+            };
+          }
+        });
       }
-    } catch (err) {
-      setError("Could not access camera. Please allow camera permissions.");
+    } catch (err: any) {
       console.error("Camera error:", err);
+      if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+        setError("Camera permission denied. Please allow camera access in your browser settings.");
+      } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+        setError("No camera found. Please connect a camera or use the file upload option.");
+      } else if (err.name === "NotReadableError" || err.name === "TrackStartError") {
+        setError("Camera is in use by another app. Please close other apps using the camera.");
+      } else {
+        setError("Could not access camera. Please try uploading a photo instead.");
+      }
     }
   }, []);
 

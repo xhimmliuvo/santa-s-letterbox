@@ -5,6 +5,7 @@ import LetterForm from "@/components/LetterForm";
 import SendingAnimation from "@/components/SendingAnimation";
 import SuccessMessage from "@/components/SuccessMessage";
 import AdminPanel from "@/components/AdminPanel";
+import TicketClaim from "@/components/TicketClaim";
 import { Button } from "@/components/ui/button";
 
 type Step = "write" | "sending" | "sent";
@@ -71,6 +72,9 @@ const Index = () => {
             <p className="text-primary-foreground/80 mt-2 font-medium">
               Make a wish for Christmas!
             </p>
+            <div className="mt-4">
+              <TicketClaim />
+            </div>
           </div>
         )}
 
